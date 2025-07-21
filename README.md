@@ -1,32 +1,53 @@
 # result-for-cpp
 
-A minimal, C++ `result<T, E>` type for error handling without exceptions. Inspired by Rust’s `Result`.
+A minimal, header-only result<T, E> implementation for C++11 — inspired by Rust’s Result. Not a full-featured clone — it's meant for embedded systems and places where exceptions are not an option.
 
-
-## Helpers
-
-    - `make_ok()` and `make_error()`.
 
 ## Example
 
 ```cpp
-#include "result.h"
-#include <string>
-#include <iostream>
 
-result::result<std::string, std::string> open_file(bool okay) {
-    if (okay)
-        return result::make_ok(std::string("file.txt"));
-    else
-        return result::make_error(std::string("failed to open file"));
+#include "result.h"
+
+#include <iostream>
+#include <string>
+
+using result::result;
+using result::make_error;
+
+struct error {
+
+    std::string message;
+
+    int code;
+
+    friend std::ostream& operator<<(std::ostream& os, const error& e) {
+        
+        return os << e.message << " (" << e.code << ")";
+    }
+};
+
+result<std::string, error> open_file(bool ok) {
+
+    if (ok) {
+
+        return "file.txt";
+    }
+
+    return make_error(error{"failed to open file", -1});
 }
 
 int main() {
-    auto res = open_file(true);
-    if (res) {
-        std::cout << "Opened: " << res.value() << "\n";
-    } else {
-        std::cout << "Error: " << res.error() << "\n";
+
+    auto result = open_file(true);
+
+    if (result) {
+
+        std::cout << "Opened: " << result.value() << "\n";
+    } 
+    else {
+
+        std::cout << "Error: " << result.error() << "\n";
     }
 }
 ```
