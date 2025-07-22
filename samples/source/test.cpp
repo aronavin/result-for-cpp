@@ -30,18 +30,16 @@ private:
 template<typename T = void, typename E = error>
 using result = result::result<T, E>;
 
-auto fail(const std::string& message, int code) {
-
-    return ::result::make_error(error(message, code));
 }
 
-}
+
+#define io_failure(message, code) (result::make_error(io::error(message, code)))
 
 io::result<int> get_value(int value) {
 
     if (value < 0) {
 
-        return io::fail("Negative value not allowed", -1);
+        return io_failure("Negative value not allowed", -1);
     }
 
     return value * (rand() % 100);
