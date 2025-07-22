@@ -37,27 +37,27 @@ auto fail(const std::string& message, int code) {
 
 }
 
-io::result<int> test(int value) {
+io::result<int> get_value(int value) {
 
     if (value < 0) {
 
         return io::fail("Negative value not allowed", -1);
     }
 
-    return value;
+    return value * (rand() % 100);
 }
 
-io::result<std::string> test_more(int value) {
+io::result<std::string> convert_to_string(int value) {
 
-    return "";
+    return std::to_string(value);
 }
 
 
 int main() {
 
-    auto result = test(0).and_then([] (int res) {
+    auto result = get_value(5).and_then([] (int res) {
 
-        return test_more(res);
+        return convert_to_string(res);
     });
 
     if (!result) {
@@ -67,7 +67,7 @@ int main() {
        return -1;
     }
 
-    std::cout << "success" << std::endl;
+    std::cout << "result: " << result.value() << std::endl;
 
     return 0;
 }
