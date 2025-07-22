@@ -47,10 +47,18 @@ io::result<int> test(int value) {
     return value;
 }
 
+io::result<std::string> test_more(int value) {
+
+    return "";
+}
+
 
 int main() {
 
-    auto result = test(0);
+    auto result = test(0).and_then([] (int res) {
+
+        return test_more(res);
+    });
 
     if (!result) {
 
