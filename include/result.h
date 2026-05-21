@@ -31,7 +31,7 @@ details::make_error<E> make_error(U&& value) {
 template <typename T, typename E>
 class result {
 public:
-    constexpr bool s_value() const { return m_has_value; }
+    constexpr bool has_value() const { return m_has_value; }
     constexpr bool is_error() const { return !m_has_value; }
     const T& value() const& {
         assert(m_has_value && "result::value() called on error result");
@@ -149,19 +149,25 @@ public:
         return m_has_value;
     }
     constexpr T& operator*() & {
+        assert(m_has_value && "dereferencing error result");
         return m_storage.value;
     }
     constexpr T&& operator*() && {
+        assert(m_has_value && "dereferencing error result");
         return std::move(m_storage.value);
     }
     constexpr T* operator->() {
+        assert(m_has_value && "dereferencing error result");
         return &m_storage.value;
     }
     constexpr bool operator==(const result& other) const {
-        if ((this->m_has_value != other.m_has_value) || !this->m_has_value) {
+        if (this->m_has_value != other.m_has_value) {
             return false;
         }
-        return (other.m_storage.value == this->m_storage.value);
+        if (m_has_value) {
+            return m_storage.value == other.m_storage.value;
+        }
+        return m_storage.error == other.m_storage.error;
     }
     constexpr bool operator!=(const result& other) const {
         return !(other == *this);
